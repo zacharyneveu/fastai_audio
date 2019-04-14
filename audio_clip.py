@@ -1,6 +1,8 @@
 from fastai.torch_core import *
-from scipy.io import wavfile
 from IPython.display import display, Audio
+import soundfile as sf
+# debug
+import sys
 
 __all__ = ['AudioClip', 'open_audio']
 
@@ -46,10 +48,17 @@ class AudioClip(ItemBase):
 
 
 def open_audio(fn):
-    sr, x = wavfile.read(fn)
+    # at first, use wavfile.read because it is significantly faster
+    x, sr = sf.read(fn, dtype='float32', always_2d=True)
+    x = x[:,0]
+
     t = torch.from_numpy(x.astype(np.float32, copy=False))
     if x.dtype == np.int16:
         t.div_(32767)
+    # not sure WHY but these show up sometimes
+    elif x.dtype == np.uint8:
+        t.sub_(127).div_(128)
+        n8 += 1
     elif x.dtype != np.float32:
         raise OSError('Encountered unexpected dtype: {}'.format(x.dtype))
     return AudioClip(t, sr)
