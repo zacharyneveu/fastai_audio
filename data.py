@@ -60,7 +60,7 @@ class AudioDataBunch(DataBunch):
 
             dataloaders = [train_dl, valid_dl, fix_dl]
             if test_ds is not None:
-                test_dl = DataLoader(test_ds, batch_size=1, **kwargs)
+                test_dl = DataLoader(test_ds, batch_size=1)
                 dataloaders.append(test_dl)
 
             return cls(*dataloaders, path=path, collate_fn=pad_collate1d, dl_tfms=tfms)
