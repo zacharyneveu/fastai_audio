@@ -1,5 +1,10 @@
 import librosa as lr
 from fastai.torch_core import *
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+import torchaudio as ta
+import torchaudio.transforms as tatfms
 
 __all__ = ['get_frequency_transforms', 'get_frequency_batch_transforms',
            'FrequencyToMel', 'ToDecibels', 'Spectrogram']

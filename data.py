@@ -41,20 +41,20 @@ class AudioDataBunch(DataBunch):
             if len(datasets) == 4:
                 test_ds = datasets[3]
                 
-            print("Beginning calculations?")
+            print("Beginning calculations...")
             train_lengths = train_ds.lengths(length_col)
-            print("Train lengths calculated")
+            print("Train lengths calculated...")
             train_sampler = SortishSampler(train_ds.x, key=lambda i: train_lengths[i], bs=bs//2)
             train_dl = DataLoader(train_ds, batch_size=bs, sampler=train_sampler)
 
             # precalculate lengths ahead of time if they aren't included in xtra
             valid_lengths = valid_ds.lengths(length_col)
-            print("Valid lengths calculated")
+            print("Valid lengths calculated...")
             valid_sampler = SortSampler(valid_ds.x, key=lambda i: valid_lengths[i])
             valid_dl = DataLoader(valid_ds, batch_size=bs, sampler=valid_sampler)
 
             fix_lengths = fix_ds.lengths(length_col)
-            print("Fix Lengths calculated")
+            print("Fix Lengths calculated...")
             fix_sampler = SortSampler(fix_ds.x, key=lambda i: fix_lengths[i])
             fix_dl = DataLoader(fix_ds, batch_size=bs, sampler=fix_sampler)
 
