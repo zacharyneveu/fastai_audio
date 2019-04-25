@@ -2,6 +2,7 @@ import librosa as lr
 from fastai.torch_core import *
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import random
 
 import torchaudio as ta
 import torchaudio.transforms as tatfms
@@ -13,7 +14,7 @@ __all__ = ['get_frequency_transforms', 'get_frequency_batch_transforms',
 def get_frequency_transforms(n_fft=2048, n_hop=512, window=torch.hann_window,
                              n_mels=None, f_min=0, f_max=None, sample_rate=44100,
                              decibels=True, ref='max', top_db=80.0, norm_db=True):
-    tfms = [Spectrogram(n_fft=n_fft, n_hop=n_hop, window=window)]
+    tfms = [Gain(), Spectrogram(n_fft=n_fft, n_hop=n_hop, window=window)]
     if n_mels is not None:
         tfms.append(FrequencyToMel(n_mels=n_mels, n_fft=n_fft, sr=sample_rate,
                                    f_min=f_min, f_max=f_max))
@@ -103,3 +104,16 @@ class Spectrogram:
         X.pow_(2.0)
         power = X[:,:,:,0] + X[:,:,:,1]
         return power
+
+################################################################################
+#   Audio Domain Transforms (run pre-spectrogram)
+################################################################################
+
+class Gain:
+    def __init__(self, gain_range=[0.5, 1.5]):
+        self.gr = gain_range
+
+    def __call__(self, x):
+        gain = ((self.gr[1]-self.gr[0])*torch.rand(x.size(0))+self.gr[0]).cuda()
+        res =  x*gain[:,None]
+        return res

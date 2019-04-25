@@ -29,7 +29,8 @@ class AudioClip(ItemBase):
 
     @property
     def num_samples(self):
-        return len(self.data)
+        #return len(self.data)
+        return self.data.size(0)
 
     @property
     def duration(self):
