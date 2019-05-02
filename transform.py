@@ -14,7 +14,7 @@ __all__ = ['get_frequency_transforms', 'get_frequency_batch_transforms',
 def get_frequency_transforms(n_fft=2048, n_hop=512, window=torch.hann_window,
                              n_mels=None, f_min=0, f_max=None, sample_rate=44100,
                              decibels=True, ref='max', top_db=80.0, norm_db=True):
-    tfms = [Gain(), Spectrogram(n_fft=n_fft, n_hop=n_hop, window=window)]
+    tfms = [Limit(), Gain(), Spectrogram(n_fft=n_fft, n_hop=n_hop, window=window)]
     if n_mels is not None:
         tfms.append(FrequencyToMel(n_mels=n_mels, n_fft=n_fft, sr=sample_rate,
                                    f_min=f_min, f_max=f_max))
@@ -117,3 +117,11 @@ class Gain:
         gain = ((self.gr[1]-self.gr[0])*torch.rand(x.size(0))+self.gr[0]).cuda()
         res =  x*gain[:,None]
         return res
+
+class Limit:
+    def __init__(self, limit_range=[0.6, 1.0]):
+        self.lr = limit_range
+
+    def __call__(self, x):
+        self.lf = random.uniform(self.lr[0], self.lr[1])
+        return torch.clamp(x, x.min()*self.lf, x.max()*self.lf)
